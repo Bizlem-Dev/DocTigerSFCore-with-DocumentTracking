@@ -1,0 +1,12 @@
+com.SOAPConsumer
+com.dao.docgeneration
+com.doc.convertors
+com.doc.generation
+com.doc.services
+com.doc.servlets
+com.doc.util
+com.dto
+com.htmltopdf
+com.qrcode
+com.testtj
+com.util
