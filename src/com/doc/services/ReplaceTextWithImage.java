@@ -43,6 +43,8 @@ import org.docx4j.wml.Tbl;
 import org.docx4j.wml.Tc;
 import org.docx4j.wml.Text;
 import org.docx4j.wml.Tr;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.doc.convertors.DocxToPdfConvertor;
 
@@ -283,6 +285,7 @@ if(table!=null) {
 									 log.info(" exc in =saveImage " + e);
 								}
 								try {
+									if(!filepath.equals(saveimgpath)) {
 									//  /home/ubuntu/generationTomcat/Images/centerimage.png
 									//String fp="/home/ubuntu/generationTomcat/Images/centerimage.png";
 									// log.info(" img file  filepath== " + fp);
@@ -294,6 +297,15 @@ if(table!=null) {
 								log.info("22" );
 								tc.getContent().add(paragraphWithImage);
 								log.info(" 33");
+								}else {
+									ObjectFactory factory = new ObjectFactory();
+									P blankparagraph = factory.createP();
+									tc.getContent().remove(0);
+									log.info("22 else" );
+									tc.getContent().add(blankparagraph);
+									log.info(" 33 else");
+
+									}
 								}catch (Exception e) {
 									// TODO: handle exception
 									 log.info(" ex in  file== " + e);
@@ -342,10 +354,96 @@ private static Tbl getTemplateTable(List<Object> tables, String templateKey) thr
 
 
 
+public static void fillTable(JSONArray removePtblArr , WordprocessingMLPackage  parentObject, Map<String, Object> paramsMap) {
+	try{
+		List<Object> tables = getAllElementFromObject(parentObject.getMainDocumentPart(), Tbl.class);
+		//System.out.println("tables "+tables);
 
+			for(int i=0; i<removePtblArr.length(); i++) {
+				String placeholder=removePtblArr.getString(i);
+		Tbl tempTable = getTemplateTable(tables, placeholder);
+		System.out.println("tempTable "+tempTable);
+		if(tempTable==null)return;
+		List<Object> tcs = getAllElementFromObject(tempTable, Tc.class);
+		System.out.println("tcs "+tcs);
+//		Tc  tc=(Tc)tcs.get(0);
+//		System.out.println("tc "+tc);
+		for (Object tcObj : tcs) {
+			
+			Tc tc = (Tc) tcObj;
 
+		List<Object> ps = getAllElementFromObject(tc, P.class);
+		System.out.println("ps "+ps);
+		 
+		for (int psI=0;psI<ps.size();psI++) {
+			 System.out.println("each ps :: "+ps.get(psI));
+				List<Object> texts = getAllElementFromObject(ps.get(psI), Text.class);
+					for (Object text : texts) {
+						Text textElement = (Text) text;
+						if(textElement.getValue().trim().equals(placeholder)){
+							if(paramsMap.containsKey(textElement.getValue().trim())) {
+							      if( paramsMap.get(textElement.getValue().trim()).toString().equals("")) {
+							        //wordMLPackage.getMainDocumentPart().getContent().remove(p);
+							       tc.getContent().remove(ps.get(psI));
+							       }else {break;
+							       }
+						       }else {
+							       tc.getContent().remove(ps.get(psI));
+						       }
+							}else {
+						    	System.out.println("in else part of fillTable");
+						    	
+						    	String textelementstr= textElement.toString();
+						    	//log.info("textelementstr "+textelementstr);
 
+						    	while (textelementstr.indexOf("<<") != -1 && textelementstr.indexOf(">>") != -1) {
+									log.info("*textelementstr.indexOf(\"<<\"): " + textelementstr.indexOf("<<"));
+									log.info("*textelementstr.indexOf(\">>\"): " + textelementstr.indexOf(">>"));
 
+									String key = textelementstr.substring(textelementstr.indexOf("<<"),
+											textelementstr.indexOf(">>") + 2);
+									log.info("*key " + key + " *textelementstr " + textelementstr);
+									
+									if(key.equals(placeholder)) {
+										log.info("key.equals(placeholder) :"+key.equals(placeholder) );
+
+										if (paramsMap.containsKey(key)) {
+											log.info("paramsMap.get(key)"+paramsMap.get(key).toString());
+											log.info("paramsMap.get(key).toString().equals(\"\") "+paramsMap.get(key).toString().equals(""));
+											if(key.equals(placeholder) && paramsMap.get(key).toString().equals("")){
+											       tc.getContent().remove(ps.get(psI));
+					                			textelementstr =textelementstr.replace(key, "");
+					                			log.info("1 :"+textelementstr);
+											}else {
+					                			textelementstr =textelementstr.replace(key, "");
+					                			log.info("2 :"+textelementstr);
+
+											}
+										}else{
+											log.info("key  not in paramMap" );
+										       tc.getContent().remove(ps.get(psI));
+				                			textelementstr =textelementstr.replace(key, "");
+				                			log.info("3 :"+textelementstr);
+
+										}
+									}else { 
+										log.info("key not in map and not equals placeholde" );
+
+			                			textelementstr =textelementstr.replace(key, "");
+			                			log.info("4 :"+textelementstr);
+
+				                    }
+									log.info( " textelementstr  5" + textelementstr);
+							}
+						}
+					}
+		 }
+		}
+	}
+	}catch (Exception e) {
+		throw new RuntimeException(e);
+	}
+}
 
 
 }

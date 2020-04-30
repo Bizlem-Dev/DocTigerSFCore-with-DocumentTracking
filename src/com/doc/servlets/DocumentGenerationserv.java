@@ -109,6 +109,8 @@ public class DocumentGenerationserv extends HttpServlet {
 		      System.out.println("filename :: "+resobj.getString("filename")+fileurl);
 		      System.out.println("jsonstring ::  "+resobj);
 		      SaveTemplateFromURL sta = new SaveTemplateFromURL();
+		      
+		      //here have to check if it is ppt or docx and save as pr that
 		      try {
 		      sta.saveTemplate(fileurl, bundle.getString("uploaded_templates_path"), TemplateName+".docx");
 		      }catch (Exception e) {

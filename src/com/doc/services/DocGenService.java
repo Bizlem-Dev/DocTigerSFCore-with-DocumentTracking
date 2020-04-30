@@ -362,9 +362,13 @@ JSONObject QRobj = new JSONObject();
 						if(accesstype.equalsIgnoreCase("private")) {
 						       docxurl = bundle.getString("doc_loc_ip_private")+"secure/"+outputFilenamencoded+IConstants.PERIOD+IConstants.EXTENSION_DOCX;
 						       url= bundle.getString("doc_loc_ip_private")+"secure/"+outputFilenamencoded+".pdf";
-						       
+								logger.info("docxurl "+docxurl);
+								logger.info("url "+url);
+
 						       try {
 									String windopdfurl = checkWordToPdfApi(docxurl);
+									logger.info("windopdfurl "+windopdfurl);
+
 									downloadFileFromUrl(windopdfurl, bundle.getString("doc_loc_private"));
 								}catch (Exception e) {
 									logger.info("exc in getWordToPdfData = "+e);
@@ -373,8 +377,13 @@ JSONObject QRobj = new JSONObject();
 						}else if(accesstype.equalsIgnoreCase("singleuse")) {
 							   docxurl = bundle.getString("doc_loc_ip_singleuse")+"onetime/"+outputFilenamencoded+IConstants.PERIOD+IConstants.EXTENSION_DOCX;
 							   url= bundle.getString("doc_loc_ip_singleuse")+"onetime/"+outputFilenamencoded+".pdf";
+							   logger.info("docxurl "+docxurl);
+								logger.info("url "+url);
+
 							   try {
 									String windopdfurl = checkWordToPdfApi(docxurl);
+									logger.info("windopdfurl "+windopdfurl);
+
 									downloadFileFromUrl(windopdfurl, bundle.getString("doc_loc_singleuse"));
 								}catch (Exception e) {
 									logger.info("exc in getWordToPdfData = "+e);
@@ -383,8 +392,13 @@ JSONObject QRobj = new JSONObject();
 						}else {
 							   docxurl = bundle.getString("doc_loc_ip")+"Attachment/"+outputFilenamencoded+IConstants.PERIOD+IConstants.EXTENSION_DOCX;
 							   url= bundle.getString("doc_loc_ip")+"Attachment/"+outputFilenamencoded+".pdf";
+							   logger.info("docxurl "+docxurl);
+								logger.info("url "+url);
+
 							   try {
 									String windopdfurl = checkWordToPdfApi(docxurl);
+									logger.info("windopdfurl"+windopdfurl);
+
 									downloadFileFromUrl(windopdfurl, bundle.getString("doc_loc"));
 								}catch (Exception e) {
 									logger.info("exc in getWordToPdfData = "+e);
@@ -537,12 +551,16 @@ JSONObject QRobj = new JSONObject();
 	
 	public static String checkWordToPdfApi(String filePath) {
 		String count=null;
+		StringBuffer response=null;
 		try {
 		//http://35.231.202.149:8095
 			
 		//URL obj = new URL("http://35.231.202.149:8095/WordToPdfApi/WindowsServletWordToPdf");
 					
-			URL obj = new URL(bundle.getString("docxtopdfwindowapi"));
+			//URL obj = new URL(bundle.getString("docxtopdfwindowapi"));
+			URL obj = new URL(bundle.getString("docxtopdfwindowapi_Updated"));
+
+			
 
 			
 		HttpURLConnection postConnection = (HttpURLConnection) obj.openConnection();
@@ -556,7 +574,7 @@ JSONObject QRobj = new JSONObject();
 		if (responseCode == HttpURLConnection.HTTP_OK) { // success
 		BufferedReader in = new BufferedReader(new InputStreamReader(postConnection.getInputStream()));
 		String inputLine;
-		StringBuffer response = new StringBuffer();
+		 response = new StringBuffer();
 		while ((inputLine = in.readLine()) != null) {
 		response.append(inputLine);
 		count=response.toString();
@@ -564,9 +582,12 @@ JSONObject QRobj = new JSONObject();
 		in.close();
 
 		} 
+logger.info("response "+response.toString());
 
 		} catch (Exception e) {
+			logger.info("error in checkWordToPdfApi "+e.getMessage());
 		return count;
+
 		}
 		return count;
 
